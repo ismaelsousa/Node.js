@@ -19,5 +19,5 @@ const Categoria = new Schema({
     }
 })
 
-//criar a tabela lá 
+//criar o modelo lá 
 mongoose.model('Categorias',Categoria)
