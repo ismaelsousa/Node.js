@@ -7,7 +7,7 @@ app.engine("handlebars", handle());
 app.set("view engine", "handlebars")
 
 //Carrega os arquivos estaticos
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname,'public')));
 
 
 //routing//encaminhamento
@@ -39,7 +39,9 @@ app.get("/specs",function(req, res){
     res.render("specs");
 })
 
+const PORT = process.env.PORT || 8081
+
 //start server in port 8080
-app.listen(8080, function(){
+app.listen(PORT, function(){
     console.log("serve rodando");
 })
