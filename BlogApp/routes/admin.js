@@ -104,5 +104,14 @@ router.post("/categorias/edit", function(req, res){
                 res.redirect("/admin/categorias")
             })
 })
-
+//rota de deletar
+router.post("/categorias/deletar", function(req, res){
+    Categoria.remove({_id:req.body.id}).then(function(){
+        req.flash("success_msg", "Deletada com sucesso")
+        res.redirect("/admin/categorias")
+    }).catch(function(error){
+        req.flash("error_msg", "Não foi possível deletar, tente novamente!")
+        res.redirect("/admin/categorias")
+    })
+})
 module.exports = router

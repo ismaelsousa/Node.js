@@ -7,7 +7,7 @@
 <h2>Lista de marcas</h2>
 <hr>
 <a href="/admin/categorias/add">
-    <button class="btn btn-success">Nova categoria</button>
+    <button class="btn btn-success">Nova marca</button>
 </a>
 {{#each categorias}}
     <div class="card mt-4">
@@ -16,9 +16,13 @@
             <a href="/admin/categorias/edit/{{_id}}">
                 <button class="btn btn-success mt-2">Editar</button>
             </a>
+            <form action="/admin/categorias/deletar" method="POST">
+                <input type="hidden" name="id" value="{{_id}}">
+                <button type="submit" class="btn btn-danger mt-2">Deletar</button>
+            </form>
             
         </div>
     </div>
 {{else}}
-
+    <h4 class="mt-3">Nenhuma marca registrada</h4>
 {{/each}}
