@@ -11,23 +11,28 @@ require("../models/Postagem")
 //pega o modulo do arquivo Postagem
 const Postagem = mongoose.model("Postagens")
 
+//carregando o helpe
+const {eAdmin} /*é um obj que pega somente a funcao eAdimn*/ = require('../helpers/eAdmin')
+
+
 //routers //rotas
+
 router.get("/", function(req, res){
     res.render("admin/index")
 })
 
-
-router.get("/posts", function(req, res){
+//para proteger a rota basta add a func eAdmin
+router.get("/posts", eAdmin ,function(req, res){
     res.send("pagina de posts")
 
 })
 
 //routers of marcar
 
-router.get("/categorias", function(req, res){
+router.get("/categorias", eAdmin,function(req, res){
     //fazendo uma busca nas categorias e passando para a pagina
     Categoria.find().sort({date: 'desc'}).then(function(categorias){
-        res.render("/admin/categorias", {categorias: categorias})
+        res.render("admin/categorias", {categorias: categorias})
     }).catch((error)=>{
         req.flash('error_msg', "houve um erro ao listas as marcas")
         res.redirect("/admin")
@@ -35,11 +40,11 @@ router.get("/categorias", function(req, res){
     
 })
 
-router.get("/categorias/add", function(req, res){
+router.get("/categorias/add",eAdmin , function(req, res){
     res.render("admin/addcategorias")
 })
 
-router.post("/categorias/nova", function(req, res){
+router.post("/categorias/nova",eAdmin , function(req, res){
     //validacao do formulario
     var erros = [] 
     //se o nome for vazio ou undefined ou null
@@ -77,7 +82,7 @@ router.post("/categorias/nova", function(req, res){
 })
 
 //quando usa ":" é um parametro que recebe
-router.get("/categorias/edit/:id", function(req, res){
+router.get("/categorias/edit/:id",eAdmin , function(req, res){
     //fazer busca no bd pelo id passado
     Categoria.findOne({_id: req.params.id}).then(function(categoria){//usa params pq foi passado 
         res.render('admin/editcategoria', {categoria: categoria});
@@ -88,7 +93,7 @@ router.get("/categorias/edit/:id", function(req, res){
     
 })
 
-router.post("/categorias/edit", function(req, res){    
+router.post("/categorias/edit",eAdmin , function(req, res){    
             Categoria.findOne({_id:req.body.id}).then(function(categoria){
                 //pega a categoria que vai ser editada e substitue os valores
                 categoria.nome = req.body.nome
@@ -107,7 +112,7 @@ router.post("/categorias/edit", function(req, res){
             })
 })
 //rota de deletar
-router.post("/categorias/deletar", function(req, res){
+router.post("/categorias/deletar", eAdmin ,function(req, res){
     Categoria.remove({_id:req.body.id}).then(function(){
         req.flash("success_msg", "Deletada com sucesso")
         res.redirect("/admin/categorias")
@@ -118,7 +123,7 @@ router.post("/categorias/deletar", function(req, res){
 })
 
 //rotas de postagem
-router.get('/postagens', function(req,res){
+router.get('/postagens',eAdmin , function(req,res){
     Postagem.find().populate("categoria").sort({data:'desc'}).then(function(postagens){
         res.render("admin/postagens",{postagens:postagens})
     }).catch(function(error){
@@ -167,7 +172,7 @@ router.post("/postagens/nova", function(req,res){
 })
 
 //rota para excluir postagens
-router.get("/postagens/deletar/:id", function(req,res){
+router.get("/postagens/deletar/:id",eAdmin , function(req,res){
     Postagem.remove({_id:req.params.id}).then(function(){
         req.flash("success_msg", "Deletado com sucesso")
         res.redirect('/admin/postagens')

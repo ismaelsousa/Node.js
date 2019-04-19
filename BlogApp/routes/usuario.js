@@ -3,15 +3,21 @@ const router = express.Router()
 const mongoose = require("mongoose")
 require('../models/Usuario')
 Usuario = mongoose.model("usuarios")
-
+const passport = require('passport')
 //import bcryptjs
 const bcrypt = require('bcryptjs')
+//carregando o helpe
+const {eAdmin} /*é um obj que pega somente a funcao eAdimn*/ = require('../helpers/eAdmin')
+
+
+
 //rotas de usuarios
-router.get("/registro", function(req,res){
+//Só pode registrar quem já é admin
+router.get("/registro", eAdmin,function(req,res){
     res.render("usuarios/registro")
 })
 
-router.post("/registro", function(req,res){
+router.post("/registro",eAdmin, function(req,res){
     var erros = []
 
     if(req.body.senha != req.body.senha2){
@@ -29,7 +35,8 @@ router.post("/registro", function(req,res){
                 const novoUsuario =new Usuario({
                     nome: req.body.nome,
                     email: req.body.email,
-                    senha: req.body.senha
+                    senha: req.body.senha,
+                    eAdmin: 1
                 })
 
                 //encriptar a senha
@@ -59,6 +66,24 @@ router.post("/registro", function(req,res){
 
 router.get("/login", function(req,res){
     res.render("usuarios/login")
+})
+
+router.post('/login',function(req,res,next){
+    //autenticando o usuario
+    passport.authenticate('local',{
+        //rota que irá se dê certo a autenticar
+        successRedirect: '/admin',
+        //caso não dê
+        failureRedirect: '/usuarios/login',
+        //ativando o flash
+        failureFlash: true
+    })(req,res,next)
+})
+
+router.get("/logout",eAdmin, function(req,res){
+    req.logOut()
+    req.flash("success_msg", "Deslogado com sucesso")
+    res.redirect('/')
 })
 
 module.exports = router

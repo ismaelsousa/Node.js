@@ -8,7 +8,8 @@ require('../models/Usuario')
 const Usuario = mongoose.model('usuarios')
 
 module.exports = function(passport){
-    passport.use(new localStrategy({usernameField: 'email'}, function(email,senha, done){
+                                                            //o passwordfiled é para indicar qual o campo tem a senha
+    passport.use(new localStrategy({usernameField: 'email', passwordField: 'senha'}, function(email,senha, done){
         Usuario.findOne({email:email}).then(function(usuario){
             //se achar um usuario
             if(!usuario){
@@ -20,7 +21,7 @@ module.exports = function(passport){
             bcrypt.compare(senha, usuario.senha, function(erro, batem){
                  //se as senhas batem
                  if(batem){
-                     return done(null, user)
+                     return done(null, usuario)
                  }else{
                      return done(null, false, {message: "Senha incorreta"})
                  }
@@ -36,8 +37,8 @@ module.exports = function(passport){
     })
 
     passport.deserializeUser(function(id, done){
-        User.findById(id, function(err,usuario){
-            done(err,user)
+        Usuario.findById(id, function(err,usuario){
+            done(err,usuario)
         })
     })
 }

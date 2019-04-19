@@ -4,7 +4,10 @@ const express = require("express")
 const handlebars = require("express-handlebars")
 //pega elementos da tela
 const bodyParser = require('body-parser')
+//express
 const app = express();
+//rotas
+const router = express.Router()
 //para usar os caminhos
 const path = require("path")
 //pegando as rotas do modulo main
@@ -40,6 +43,10 @@ require('./config/auth')(passport)
     app.use(function(req,res,next) {
         res.locals.success_msg = req.flash('success_msg')
         res.locals.error_msg = req.flash('error_msg')
+        res.locals.error = req.flash('error')
+        //guarda os dados do usuario
+        //req.use é criado pelo passport
+        res.locals.user = req.user || null
         //defini que pode proseguir para o link
         next();
     })
@@ -70,6 +77,9 @@ require('./config/auth')(passport)
     //referenciando a rota e o modulo
     app.use('/admin',admin)
     app.use("/usuarios",usuarios)
+    app.get("/", function(req,res){
+        res.render('public/index')
+    })
 //outros
 const PORT = 8081;
 app.listen(PORT, function(){
