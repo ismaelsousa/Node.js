@@ -10,9 +10,9 @@
     <div class="card-body">
         <form action="/admin/categorias/nova" method="POST"> 
             <label for="nome"> Nome: </label>
-                <input type="text" id="nome" name="nome" placeholder="Nome da marca" class="form-control"> 
+                <input type="text" id="nome" name="nome" placeholder="Nome da marca" class="form-control" required> 
             <label for="slug">Slug</label>
-                <input type="text" id="slug" name="slug" placeholder="Slug da marca" class="form-control">
+                <input type="text" id="slug" name="slug" placeholder="Digite novamente a marca" class="form-control" required>
                 <br>
             <button type="submit" class="btn btn-success">Criar marca</button>
         </form>

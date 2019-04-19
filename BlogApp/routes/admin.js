@@ -3,11 +3,13 @@ const router = express.Router()
 const mongoose = require("mongoose")
 //carregando models categorias
 require("../models/Categoria")
-
 //pega o modulo do arquivo Categorias.js
 const Categoria = mongoose.model("Categorias")
 
-
+//carrengando o model de postagem
+require("../models/Postagem")
+//pega o modulo do arquivo Postagem
+const Postagem = mongoose.model("Postagens")
 
 //routers //rotas
 router.get("/", function(req, res){
@@ -25,7 +27,7 @@ router.get("/posts", function(req, res){
 router.get("/categorias", function(req, res){
     //fazendo uma busca nas categorias e passando para a pagina
     Categoria.find().sort({date: 'desc'}).then(function(categorias){
-        res.render("admin/categorias", {categorias: categorias})
+        res.render("/admin/categorias", {categorias: categorias})
     }).catch((error)=>{
         req.flash('error_msg', "houve um erro ao listas as marcas")
         res.redirect("/admin")
@@ -112,6 +114,66 @@ router.post("/categorias/deletar", function(req, res){
     }).catch(function(error){
         req.flash("error_msg", "Não foi possível deletar, tente novamente!")
         res.redirect("/admin/categorias")
+    })
+})
+
+//rotas de postagem
+router.get('/postagens', function(req,res){
+    Postagem.find().populate("categoria").sort({data:'desc'}).then(function(postagens){
+        res.render("admin/postagens",{postagens:postagens})
+    }).catch(function(error){
+        req.flash("error_msg","Houve um erro ao listas as mensagens")
+        res.redirect('/admin')
+    })
+    
+})
+
+router.get('/postagens/add', function(req,res){
+    Categoria.find().then((categorias)=>{
+        res.render("admin/addpostagem", {categorias:categorias})
+    }).catch(function(error){
+        req.flash("error_msg", "Houve um erro ao carregar o formulário")
+        res.redirect("/admin")
+    })  
+})
+
+router.post("/postagens/nova", function(req,res){
+    //verificacao se nao tinha categoria
+
+    var erros = []
+    if(req.body.categoria == '0'){
+        erros.push({texto: "Categoria inválida"})
+    }
+
+    if(erros.length > 0){
+        res.render('admin/postagens/add', {erros: erros})
+    }else{
+        const novaPostagem ={
+            titulo: req.body.titulo,
+            descricao: req.body.descricao,
+            email: req.body.email,
+            categoria: req.body.categoria,
+            telefone: req.body.telefone
+        }
+
+        new Postagem(novaPostagem).save().then(function(){            
+            req.flash("success_msg","Mensagem enviada com sucesso")
+            res.redirect("/admin/postagens/add")
+        }).catch(function(error){
+            req.flash("error_msg", "Houve um erro ao enviar a mensagem")
+            res.redirect("/admin/postagens/add")
+        })
+    }
+})
+
+//rota para excluir postagens
+router.get("/postagens/deletar/:id", function(req,res){
+    Postagem.remove({_id:req.params.id}).then(function(){
+        req.flash("success_msg", "Deletado com sucesso")
+        res.redirect('/admin/postagens')
+    }).catch(function(error){
+        req.flash("error_msg", 'Houve um erro ao deletar')
+        res.redirect('/admin/postagens')
     })
 })
 module.exports = router

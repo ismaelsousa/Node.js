@@ -9,14 +9,17 @@ const app = express();
 const path = require("path")
 //pegando as rotas do modulo main
 const admin = require('./routes/admin')
+const usuarios = require('./routes/usuario')
 //carregando o mongo
 const mongoose = require('mongoose')
 //carregando o modulo session
 const session = require('express-session')
 //carregando o modulo flash que só aparece uma vez
 const flash = require('connect-flash')
-
-
+//carregar o passport
+const passport = require('passport')
+//chamar o modulo
+require('./config/auth')(passport)
 
 //configurações 
     //session
@@ -25,12 +28,16 @@ const flash = require('connect-flash')
         resave: true,
         saveUninitialized: true
     }))
+
+    //entre a sessao e o flash
+
+    app.use(passport.initialize())
+    app.use(passport.session())
     //flash
     app.use(flash())
 
     //Middlewares
     app.use(function(req,res,next) {
-        console.log('eu sou middlewares')
         res.locals.success_msg = req.flash('success_msg')
         res.locals.error_msg = req.flash('error_msg')
         //defini que pode proseguir para o link
@@ -62,6 +69,7 @@ const flash = require('connect-flash')
 //rotas
     //referenciando a rota e o modulo
     app.use('/admin',admin)
+    app.use("/usuarios",usuarios)
 //outros
 const PORT = 8081;
 app.listen(PORT, function(){
